@@ -24,10 +24,21 @@ RUN yum makecache fast; yum clean all && yum -y update && yum -y upgrade; yum cl
     yum install -y yum-plugin-ovl; yum clean all && yum -y groupinstall "Development Tools"; yum clean all
 
 RUN yum -y install gcc gcc-c++ make autoconf aclocal automake libtool \
-    libjpeg-devel giflib-devel libpng-devel libtiff-devel zlib-devel \
+    libjpeg-devel libpng-devel libtiff-devel zlib-devel \ 
     libzip-devel freetype-devel lcms2-devel libwebp-devel \
-    libicu-devel tcl-devel tk-devel pango-devel cairo-devel; yum clean all
-# 	giflib-devel for gif
+    libicu-devel tcl-devel tk-devel pango-devel cairo-devel epel-release ; yum clean all && \
+    rpm -i http://mirror.centos.org/centos/8/AppStream/x86_64/os/Packages/giflib-5.1.4-3.el8.x86_64.rpm && \
+    rpm -i http://mirror.centos.org/centos/8/PowerTools/x86_64/os/Packages/giflib-devel-5.1.4-3.el8.x86_64.rpm
+# RUN yum -y install wget && \
+    # wget http://springdale.math.ias.edu/data/puias/unsupported/7/x86_64/dnf-conf-0.6.4-2.sdl7.noarch.rpm && \
+    # wget http://springdale.math.ias.edu/data/puias/unsupported/7/x86_64//dnf-0.6.4-2.sdl7.noarch.rpm && \
+    # wget http://springdale.math.ias.edu/data/puias/unsupported/7/x86_64/python-dnf-0.6.4-2.sdl7.noarch.rpm && \
+    # yum install python-dnf-0.6.4-2.sdl7.noarch.rpm  dnf-0.6.4-2.sdl7.noarch.rpm dnf-conf-0.6.4-2.sdl7.noarch.rpm 
+    # wget http://mirror.centos.org/centos/7/os/x86_64/Packages/giflib-4.1.6-9.el7.x86_64.rpm && \
+    # yum install giflib-4.1.6-9.el7.x86_64.rpm
+# RUN dnf --enablerepo=PowerTools install giflib-devel
+# RUN dnf --enablerepo=PowerTools install giflib-devel
+# 	giflib-devel,epel-release,dnf
 WORKDIR ${TMP_BUILD}/leptonica-build
 RUN curl -L https://github.com/DanBloomberg/leptonica/releases/download/${LEPTONICA_VERSION}/leptonica-${LEPTONICA_VERSION}.tar.gz | tar xz && cd ${TMP_BUILD}/leptonica-build/leptonica-${LEPTONICA_VERSION} && \
     ./configure --prefix=${LEPTONICA} && make && make install && cp -r ./src/.libs /opt/liblept
@@ -49,6 +60,18 @@ RUN mkdir -p ${DIST}/lib && mkdir -p ${DIST}/bin && \
     cp ${TESSERACT}/lib/libtesseract.so.4  ${DIST}/lib/ && \
     cp ${LEPTONICA}/lib/liblept.so.5 ${DIST}/lib/liblept.so.5 && \
     cp /usr/lib64/libwebp.so.4 ${DIST}/lib/ && \
+    #for other libs
+    # cp /usr/lib64/freetype.so.4 ${DIST}/lib/ && \
+    # cp /usr/lib64/libzip.so.4 ${DIST}/lib/ && \
+    # cp /usr/lib64/zlib.so.4 ${DIST}/lib/ && \
+    # cp /usr/lib64/libpng.so.4 ${DIST}/lib/ && \
+    # cp /usr/lib64/libjpeg.so.4 ${DIST}/lib/ && \
+    # cp /usr/lib64/libtiff.so.4 ${DIST}/lib/ && \
+    # yum install giflib && \
+    # cd /usr/lib64 && ls && \
+    # cd /usr/share/doc/giflib-devel-4.1.6 && ls && \
+    cp /usr/lib64/libgif.so ${DIST}/lib/ && \
+    # cp /usr/lib64/freetype.so.6 ${DIST}/lib/ && \
     echo -e "LEPTONICA_VERSION=${LEPTONICA_VERSION}\nTESSERACT_VERSION=${TESSERACT_VERSION}\nTESSERACT_DATA_FILES=tessdata${TESSERACT_DATA_SUFFIX}/${TESSERACT_DATA_VERSION}" > ${DIST}/TESSERACT-README.md && \
     find ${DIST}/lib -name '*.so*' | xargs strip -s
 
