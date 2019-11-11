@@ -24,10 +24,10 @@ RUN yum makecache fast; yum clean all && yum -y update && yum -y upgrade; yum cl
     yum install -y yum-plugin-ovl; yum clean all && yum -y groupinstall "Development Tools"; yum clean all
 
 RUN yum -y install gcc gcc-c++ make autoconf aclocal automake libtool \
-    libjpeg-devel libpng-devel libtiff-devel zlib-devel \
+    libjpeg-devel giflib-devel libpng-devel libtiff-devel zlib-devel \
     libzip-devel freetype-devel lcms2-devel libwebp-devel \
     libicu-devel tcl-devel tk-devel pango-devel cairo-devel; yum clean all
-
+# 	giflib-devel for gif
 WORKDIR ${TMP_BUILD}/leptonica-build
 RUN curl -L https://github.com/DanBloomberg/leptonica/releases/download/${LEPTONICA_VERSION}/leptonica-${LEPTONICA_VERSION}.tar.gz | tar xz && cd ${TMP_BUILD}/leptonica-build/leptonica-${LEPTONICA_VERSION} && \
     ./configure --prefix=${LEPTONICA} && make && make install && cp -r ./src/.libs /opt/liblept
