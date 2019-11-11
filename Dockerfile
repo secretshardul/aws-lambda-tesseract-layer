@@ -71,6 +71,7 @@ RUN mkdir -p ${DIST}/lib && mkdir -p ${DIST}/bin && \
     # cd /usr/lib64 && ls && \
     # cd /usr/share/doc/giflib-devel-4.1.6 && ls && \
     cp /usr/lib64/libgif.so ${DIST}/lib/ && \
+    cp /usr/lib64/libgif.so.7 ${DIST}/lib/ && \
     # cp /usr/lib64/freetype.so.6 ${DIST}/lib/ && \
     echo -e "LEPTONICA_VERSION=${LEPTONICA_VERSION}\nTESSERACT_VERSION=${TESSERACT_VERSION}\nTESSERACT_DATA_FILES=tessdata${TESSERACT_DATA_SUFFIX}/${TESSERACT_DATA_VERSION}" > ${DIST}/TESSERACT-README.md && \
     find ${DIST}/lib -name '*.so*' | xargs strip -s
