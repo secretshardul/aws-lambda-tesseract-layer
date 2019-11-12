@@ -10,13 +10,14 @@ ARG DIST=/opt/build-dist
 # change OCR_LANG to enable the layer for different languages
 ARG ind="san hin urd pan mar guj asm ben ori kan tel tam mal sin nep bod dzo"
 ARG middle="pus ara fas tur aze aze_cyrl kat kat_old heb kur syr"
-ARG eurasia="kaz kir tgk uzb uzb_cyrl uig"
+#ARG eurasia="kaz kir tgk uzb uzb_cyrl uig"
 ARG africa="afr amh swa tir"
-ARG west="eng enm gle cym fra frm spa spa_old glg eus cat ita ita_old mlt lat ell grc por pol ces hun deu yid frk nld dan nor swe fin isl lav lit est rus ukr bel bos bul hrv mkd ron slk slv sqi srp srp_latn"
+ARG west="eng enm gle cym fra frm spa spa_old glg eus cat ita ita_old mlt lat ell grc por pol ces hun deu yid frk nld dan nor swe fin isl" 
 ARG east="chi_sim chi_sim_vert chi_tra chi_tra_vert kor kor_vert jpn jpn_vert"
 ARG sea="mya msa ind jav tha lao vie khm tgl ceb"
 ARG misc="equ chr hat iku epo"
-ARG LANGS="$misc $ind $middle $eurasia $africa $west $east $sea"
+ARG LANGS="$misc $ind $middle $africa $west $east $sea"
+# languages to skip: $ eurasia lav lit est rus ukr bel bos bul hrv mkd ron slk slv sqi srp srp_latn
 # ARG OCR_LANG=deu
 # change TESSERACT_DATA_SUFFIX to use different datafiles (options: "_best", "_fast" and "")
 ARG TESSERACT_DATA_SUFFIX=_fast
@@ -28,10 +29,10 @@ RUN yum makecache fast; yum clean all && yum -y update && yum -y upgrade; yum cl
 RUN yum -y install gcc gcc-c++ make autoconf aclocal automake libtool \
     libjpeg-devel libpng-devel libtiff-devel zlib-devel \ 
     libzip-devel freetype-devel lcms2-devel libwebp-devel \
-    libicu-devel tcl-devel tk-devel pango-devel cairo-devel epel-release ; yum clean all && \
+    tcl-devel tk-devel epel-release ; yum clean all && \
     rpm -i http://mirror.centos.org/centos/8/AppStream/x86_64/os/Packages/giflib-5.1.4-3.el8.x86_64.rpm && \
     rpm -i http://mirror.centos.org/centos/8/PowerTools/x86_64/os/Packages/giflib-devel-5.1.4-3.el8.x86_64.rpm
-
+# training tools removed:  pango-devel cairo-devel libicu-devel
 WORKDIR ${TMP_BUILD}/leptonica-build
 RUN curl -L https://github.com/DanBloomberg/leptonica/releases/download/${LEPTONICA_VERSION}/leptonica-${LEPTONICA_VERSION}.tar.gz | tar xz && cd ${TMP_BUILD}/leptonica-build/leptonica-${LEPTONICA_VERSION} && \
     ./configure --prefix=${LEPTONICA} && make && make install && cp -r ./src/.libs /opt/liblept
