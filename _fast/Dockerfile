@@ -8,18 +8,18 @@ ARG TESSERACT=/opt/tesseract
 ARG LEPTONICA=/opt/leptonica
 ARG DIST=/opt/build-dist
 # change OCR_LANG to enable the layer for different languages
-# ARG ind="san hin urd pan mar guj asm ben ori kan tel tam mal sin nep bod dzo"
-# ARG middle="pus ara fas tur aze aze_cyrl kat kat_old heb kur syr"
-# ARG eurasia="kaz kir tgk uzb uzb_cyrl uig"
-# ARG africa="afr amh swa tir"
-# ARG west="eng enm gle cym fra frm spa spa_old glg eus cat ita ita_old mlt lat ell grc por pol ces hun deu yid frk nld dan nor swe fin isl lav lit est rus ukr bel bos bul hrv mkd ron slk slv sqi srp srp_latn"
-# ARG east="chi_sim chi_sim_vert chi_tra chi_tra_vert kor kor_vert jpn jpn_vert"
-# ARG sea="mya msa ind jav tha lao vie khm tgl ceb"
-# ARG misc="equ chr hat iku epo"
-# ARG LANGS="$misc $ind $middle $eurasia $africa $west $east $sea"
+ARG ind="san hin urd pan mar guj asm ben ori kan tel tam mal sin nep bod dzo"
+ARG middle="pus ara fas tur aze aze_cyrl kat kat_old heb kur syr"
+ARG eurasia="kaz kir tgk uzb uzb_cyrl uig"
+ARG africa="afr amh swa tir"
+ARG west="eng enm gle cym fra frm spa spa_old glg eus cat ita ita_old mlt lat ell grc por pol ces hun deu yid frk nld dan nor swe fin isl lav lit est rus ukr bel bos bul hrv mkd ron slk slv sqi srp srp_latn"
+ARG east="chi_sim chi_sim_vert chi_tra chi_tra_vert kor kor_vert jpn jpn_vert"
+ARG sea="mya msa ind jav tha lao vie khm tgl ceb"
+ARG misc="equ chr hat iku epo"
+ARG LANGS="$misc $ind $middle $eurasia $africa $west $east $sea"
 # ARG OCR_LANG=deu
 # change TESSERACT_DATA_SUFFIX to use different datafiles (options: "_best", "_fast" and "")
-ARG TESSERACT_DATA_SUFFIX=_best
+ARG TESSERACT_DATA_SUFFIX=_fast
 ARG TESSERACT_DATA_VERSION=4.0.0
 
 RUN yum makecache fast; yum clean all && yum -y update && yum -y upgrade; yum clean all && \
@@ -45,7 +45,7 @@ RUN curl https://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-${AUTOCONF_AR
 WORKDIR ${TMP_BUILD}/tesseract-build
 RUN curl -L https://github.com/tesseract-ocr/tesseract/archive/${TESSERACT_VERSION}.tar.gz | tar xz && \
     cd tesseract-${TESSERACT_VERSION} && ./autogen.sh  && PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
-    ./configure --prefix=${TESSERACT} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib && make && make install
+    ./configure --prefix=${TESSERACT} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib --disable-openmp 'CXXFLAGS=-g -O2 -fno-math-errno -Wall -Wextra -Wpedantic' && make && make install
 
 WORKDIR /opt
 RUN mkdir -p ${DIST}/lib && mkdir -p ${DIST}/bin && \

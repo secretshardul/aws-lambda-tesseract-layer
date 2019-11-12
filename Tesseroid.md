@@ -15,3 +15,8 @@ chi_sim,chi_tra,jpn,kor,spa,eng,fra,nld,deu,rus,lat,grc,ell,ara,hin,ben,
 
 # improvements in build file
 1. formats- giflib-devel 
+ 
+# size limit 250MB
+```sh
+du -hsc * # find directory size
+```
