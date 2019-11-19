@@ -12,7 +12,6 @@ layers:
   layer_fast:
     path: _fast/layer
     compatibleRuntimes:
-      - python3.6
       - python3.7
   # layer_best:
   #   path: /_best/layer

@@ -12,12 +12,12 @@ ARG ind="san hin urd pan mar guj asm ben ori kan tel tam mal sin nep bod dzo"
 ARG middle="pus ara fas tur aze aze_cyrl kat kat_old heb kur syr"
 #ARG eurasia="kaz kir tgk uzb uzb_cyrl uig"
 ARG africa="afr amh swa tir"
-ARG west="eng enm gle cym fra frm spa spa_old glg eus cat ita ita_old mlt lat ell grc por pol ces hun deu yid frk nld dan nor swe fin isl" 
+ARG west="eng enm gle cym fra frm spa spa_old glg eus cat ita ita_old mlt lat ell grc por pol ces hun deu yid frk nld dan nor swe fin isl lav lit est rus" 
 ARG east="chi_sim chi_sim_vert chi_tra chi_tra_vert kor kor_vert jpn jpn_vert"
 ARG sea="mya msa ind jav tha lao vie khm tgl ceb"
 ARG misc="equ chr hat iku epo"
 ARG LANGS="$misc $ind $middle $africa $west $east $sea"
-# languages to skip: $ eurasia lav lit est rus ukr bel bos bul hrv mkd ron slk slv sqi srp srp_latn
+# languages to skip: $ eurasia ukr bel bos bul hrv mkd ron slk slv sqi srp srp_latn
 # ARG OCR_LANG=deu
 # change TESSERACT_DATA_SUFFIX to use different datafiles (options: "_best", "_fast" and "")
 ARG TESSERACT_DATA_SUFFIX=_fast
@@ -66,6 +66,14 @@ RUN curl -L https://github.com/tesseract-ocr/tessdata${TESSERACT_DATA_SUFFIX}/ra
     curl -L https://github.com/tesseract-ocr/tessdata${TESSERACT_DATA_SUFFIX}/raw/${TESSERACT_DATA_VERSION}/eng.traineddata > eng.traineddata 
 RUN for OCR_LANG in ${LANGS}; do \    
     curl -L https://github.com/tesseract-ocr/tessdata${TESSERACT_DATA_SUFFIX}/raw/${TESSERACT_DATA_VERSION}/${OCR_LANG}.traineddata > ${OCR_LANG}.traineddata \
-    ;done
-
+    ;done && \
+    curl -L https://github.com/tesseract-ocr/tessconfigs/archive/master.zip > master.zip && \
+    unzip master.zip && mv tessconfigs-master/* . && \
+    rm -r master.zip tessconfigs-master
+    
+# need tessconfig here
+# wget,
+# unzip master.zip
+# mv tessconfigs-master/* .
+# rm -r master.zip tessconfigs-master
 WORKDIR /var/task
