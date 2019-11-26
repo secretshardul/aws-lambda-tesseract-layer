@@ -61,54 +61,52 @@ RUN curl -L https://github.com/tesseract-ocr/tesseract/archive/${TESSERACT_VERSI
 #ghostscript, qpdf, jbig2enc, pngquant, unpaper
 # --disable-compile-inits --with-x --with-drivers=ALL --without-luratech --with-libiconv=gnu --prefix=/usr/local
 WORKDIR ${TMP_BUILD}/ghostscript-build
-RUN curl -L https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs950/ghostscript-9.50.tar.gz > ghostscript.tar.gz && \
-    tar -zxvf ghostscript.tar.gz && \
+RUN curl -L https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs950/ghostscript-9.50.tar.gz | tar xz && \
     cd ghostscript-9.50 && \
     ./autogen.sh && \
     PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
     ./configure  --prefix=${GHOSTSCRIPT} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib && \
-    make && make install && \
-    cd .. && rm -r ghostscript.tar.gz ghostscript-9.50  
+    make && make install 
 
 WORKDIR ${TMP_BUILD}/qpdf-build    
-RUN curl -L https://github.com/qpdf/qpdf/archive/release-qpdf-9.1.0.tar.gz > qpdf-release-qpdf-9.1.0.tar.gz && \
-    tar -zxvf qpdf-release-qpdf-9.1.0.tar.gz && \
+RUN curl -L https://github.com/qpdf/qpdf/archive/release-qpdf-9.1.0.tar.gz | tar xz && \
     cd qpdf-release-qpdf-9.1.0 && \
     ./autogen.sh && \
     PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
     ./configure  --prefix=${QPDF} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib && \
-    make && make install && \
-    cd .. && rm -r qpdf-release-qpdf-9.1.0.tar.gz qpdf-release-qpdf-9.1.0  
+    make && make install 
 
+RUN echo "showing leptonica library" && \
+    cd /opt/leptonica && \
+    find | sed 's|[^/]*/|- |g'
+
+#--------------------------- jbig2enc issue----------------------------------------------------
+# PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
+# --prefix=${JBIG2ENC} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib  && \
 WORKDIR ${TMP_BUILD}/jbig2enc-build  
-RUN curl -L https://github.com/agl/jbig2enc/archive/0.29.tar.gz > jbig2enc-0.29.tar.gz && \
-    tar -zxvf jbig2enc-0.29.tar.gz && \
+RUN curl -L https://github.com/agl/jbig2enc/archive/0.29.tar.gz | tar xz && \
     cd jbig2enc-0.29 && \
     ./autogen.sh && \
-    PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
-    ./configure  --prefix=${JBIG2ENC} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib && \
-    make && make install && \
-    cd .. && rm -r jbig2enc-0.29.tar.gz jbig2enc-0.29 
+    env CPPFLAGS='-I/opt/leptonica/include/' LDFLAGS='-L/opt/leptonica/lib/' ./configure && \
+    make && make install 
+
+#-------------------------------------------------------------------------------------------
 
 WORKDIR ${TMP_BUILD}/pngquant-build  
-RUN curl -L https://github.com/kornelski/pngquant/archive/2.12.1.tar.gz > pngquant-2.12.1.tar.gz && \
-    tar -zxvf pngquant-2.12.1.tar.gz && \
+RUN curl -L https://github.com/kornelski/pngquant/archive/2.12.1.tar.gz | tar xz && \
     cd pngquant-2.12.1 && \
     ./autogen.sh && \
     PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
     ./configure  --prefix=${PNGQUANT} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib && \
-    make && make install && \
-    cd .. && rm -r pngquant-2.12.1.tar.gz pngquant-2.12.1 
+    make && make install 
 
 WORKDIR ${TMP_BUILD}/unpaper-build  
-RUN curl -L https://github.com/Flameeyes/unpaper/archive/unpaper-6.1.tar.gz > unpaper-unpaper-6.1.tar.gz && \
-    tar -zxvf unpaper-unpaper-6.1.tar.gz && \
+RUN curl -L https://github.com/Flameeyes/unpaper/archive/unpaper-6.1.tar.gz | tar xz && \
     cd unpaper-unpaper-6.1 && \
     ./autogen.sh && \
     PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
     ./configure  --prefix=${UNPAPER} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib && \
-    make && make install && \
-    cd .. && rm -r unpaper-unpaper-6.1.tar.gz unpaper-unpaper-6.1 
+    make && make install 
     
 
 # RUN yum install qpdf && \
