@@ -11,6 +11,7 @@ ARG QPDF_VERSION=release-qpdf-9.1.0
 ARG JBIG2ENC_VERSION=0.29
 ARG LIBIMAGEQUANT_VERSION=2.12.5
 ARG PNGQUANT_VERSION=2.12.1
+ARG LIBAV_VERSION=12.3
 ARG UNPAPER_VERSION=unpaper-6.1
 
 ARG TMP_BUILD=/tmp
@@ -20,8 +21,9 @@ ARG LEPTONICA=/opt/leptonica
 ARG GHOSTSCRIPT=/opt/ghostscript
 ARG QPDF=/opt/qpdf
 ARG JBIG2ENC=/opt/jbig2enc
-ARG LIBIMAGEQUANT=/opt/libimagequant
+# LIBIMGQUANT removed
 ARG PNGQUANT=/opt/pngquant
+ARG LIBAV=/opt/libav
 ARG UNPAPER=/opt/unpaper
 ARG DIST=/opt/build-dist
 
@@ -110,12 +112,23 @@ RUN curl -L https://github.com/kornelski/pngquant/archive/${PNGQUANT_VERSION}.ta
     ./configure  --prefix=${PNGQUANT} --with-libimagequant=../libimagequant-${LIBIMAGEQUANT_VERSION} &&  \
     make && make install 
 
+WORKDIR ${TMP_BUILD}/libav-build  
+RUN yum -y install yasm && \
+    curl -L https://github.com/libav/libav/archive/v${LIBAV_VERSION}.tar.gz | tar xz && \
+    cd libav-${LIBAV_VERSION} && \
+    ./configure  --prefix=${LIBAV} && \
+    make && make install 
+
+#---------------unpaper issue----------------------------------
+# LIBAV_CFLAGS='-I/opt/libav/include' LIBAV_LIBS='-L/opt/libav/lib'
 WORKDIR ${TMP_BUILD}/unpaper-build  
 RUN curl -L https://github.com/Flameeyes/unpaper/archive/${UNPAPER_VERSION}.tar.gz | tar xz && \
-    cd unpaper-${UNPAPER_VERSION} && \
-    ./configure  --prefix=${UNPAPER} CFLAGS="-O2 -march=native -pipe -flto" && \
+    cd unpaper-${UNPAPER_VERSION} && ls && \
+    autoreconf -i && \
+    PKG_CONFIG_PATH=${LIBAV}/lib/pkgconfig \
+    ./configure  --prefix=${UNPAPER} CFLAGS="-O2 -march=native -pipe -flto"  && \
     make && make install 
-    
+#--------------------------------------    
 
 # RUN yum install qpdf && \
 #     git clone https://github.com/agl/jbig2enc > jbig2enc.zip && \
@@ -130,7 +143,7 @@ RUN curl -L https://github.com/Flameeyes/unpaper/archive/${UNPAPER_VERSION}.tar.
 
 
 # $(DIST) gives root
-#ghostscript, qpdf, jbig2enc, pngquant, unpaper
+#ghostscript, qpdf, jbig2enc, pngquant, libav, unpaper
 WORKDIR /opt 
 RUN mkdir -p ${DIST}/lib && mkdir -p ${DIST}/bin && \
     cp ${TESSERACT}/bin/tesseract ${DIST}/bin/ && \
@@ -140,6 +153,7 @@ RUN mkdir -p ${DIST}/lib && mkdir -p ${DIST}/bin && \
     cp ${QPDF}/bin/* ${DIST}/bin/ && cp ${QPDF}/lib/* ${DIST}/lib/ && \
     cp ${JBIG2ENC}/bin/* ${DIST}/bin/ && cp ${JBIG2ENC}/lib/* ${DIST}/lib/ && \
     cp ${PNGQUANT}/bin/* ${DIST}/bin/ && cp ${PNGQUANT}/lib/* ${DIST}/lib/ && \
+    cp ${LIBAV}/bin/* ${DIST}/bin/ && cp ${LIBAV}/lib/* ${DIST}/lib/ && \
     cp ${UNPAPER}/bin/* ${DIST}/bin/ && cp ${UNPAPER}/lib/* ${DIST}/lib/ && \
     cp /usr/lib64/libwebp.so.4 ${DIST}/lib/ && \
     #for other libs

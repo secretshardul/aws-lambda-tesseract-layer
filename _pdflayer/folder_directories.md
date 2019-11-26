@@ -1,0 +1,221 @@
+In /opt/leptonica
+showing leptonica library
+.
+- include
+- - leptonica
+- - - endianness.h
+- - - imageio.h
+- - - allheaders.h
+- - - bmf.h
+- - - rbtree.h
+- - - bilateral.h
+- - - morph.h
+- - - dewarp.h
+- - - environ.h
+- - - leptwin.h
+- - - bbuffer.h
+- - - list.h
+- - - jbclass.h
+- - - readbarcode.h
+- - - gplot.h
+- - - arrayaccess.h
+- - - regutils.h
+- - - heap.h
+- - - stringcode.h
+- - - bmp.h
+- - - recog.h
+- - - stack.h
+- - - ccbord.h
+- - - array.h
+- - - pix.h
+- - - watershed.h
+- - - queue.h
+- - - sudoku.h
+- - - alltypes.h
+- - - bmfdata.h
+- - - ptra.h
+- bin
+- - imagetops
+- - fileinfo
+- - converttops
+- - convertsegfilestops
+- - convertfilestopdf
+- - convertformat
+- - converttopdf
+- - xtractprotos
+- - convertsegfilestopdf
+- - convertfilestops
+- lib
+- - liblept.so
+- - liblept.so.5.0.3
+- - liblept.la
+- - liblept.so.5
+- - pkgconfig
+- - - lept.pc
+- - liblept.a
+
+In /opt/libimagequant
+
+showing libimagequant library
+.
+- include
+- - libimagequant.h
+- lib
+- - libimagequant.a
+- - libimagequant.so
+- - pkgconfig
+- - - imagequant.pc
+- - libimagequant.so.0
+
+/opt/libav
+showing libav library
+.
+- include
+- - libavresample
+- - - avresample.h
+- - - version.h
+- - libavutil
+- - - error.h
+- - - channel_layout.h
+- - - audio_fifo.h
+- - - stereo3d.h
+- - - hwcontext_vaapi.h
+- - - mathematics.h
+- - - hwcontext_vdpau.h
+- - - log.h
+- - - hwcontext_dxva2.h
+- - - pixfmt.h
+- - - common.h
+- - - base64.h
+- - - fifo.h
+- - - random_seed.h
+- - - aes.h
+- - - hwcontext_cuda.h
+- - - lfg.h
+- - - hwcontext.h
+- - - avutil.h
+- - - macros.h
+- - - display.h
+- - - hmac.h
+- - - buffer.h
+- - - file.h
+- - - cpu.h
+- - - xtea.h
+- - - imgutils.h
+- - - eval.h
+- - - time.h
+- - - intfloat.h
+- - - parseutils.h
+- - - dict.h
+- - - mem.h
+- - - intreadwrite.h
+- - - rational.h
+- - - avconfig.h
+- - - replaygain.h
+- - - adler32.h
+- - - avassert.h
+- - - avstring.h
+- - - samplefmt.h
+- - - blowfish.h
+- - - crc.h
+- - - sha.h
+- - - md5.h
+- - - frame.h
+- - - hwcontext_qsv.h
+- - - lzo.h
+- - - opt.h
+- - - pixdesc.h
+- - - downmix_info.h
+- - - attributes.h
+- - - version.h
+- - - bswap.h
+- - libavcodec
+- - - avfft.h
+- - - vaapi.h
+- - - xvmc.h
+- - - vda.h
+- - - vdpau.h
+- - - d3d11va.h
+- - - dv_profile.h
+- - - vorbis_parser.h
+- - - qsv.h
+- - - dxva2.h
+- - - dirac.h
+- - - avcodec.h
+- - - version.h
+- - libavfilter
+- - - avfilter.h
+- - - buffersink.h
+- - - buffersrc.h
+- - - avfiltergraph.h
+- - - version.h
+- - libswscale
+- - - swscale.h
+- - - version.h
+- - libavdevice
+- - - avdevice.h
+- - - version.h
+- - libavformat
+- - - avio.h
+- - - avformat.h
+- - - version.h
+- bin
+- - avprobe
+- - avconv
+- share
+- - avconv
+- - - libx264-veryslow_firstpass.avpreset
+- - - libx264-placebo.avpreset
+- - - libx264-veryslow.avpreset
+- - - libvpx-720p.avpreset
+- - - libx264-slow.avpreset
+- - - libx264-ipod320.avpreset
+- - - libx264-ipod640.avpreset
+- - - libx264-baseline.avpreset
+- - - libx264-placebo_firstpass.avpreset
+- - - libx264-slower_firstpass.avpreset
+- - - libx264-main.avpreset
+- - - libvpx-360p.avpreset
+- - - libx264-lossless_slow.avpreset
+- - - libx264-veryfast_firstpass.avpreset
+- - - libx264-superfast.avpreset
+- - - libvpx-1080p50_60.avpreset
+- - - libx264-medium.avpreset
+- - - libx264-lossless_max.avpreset
+- - - libx264-slow_firstpass.avpreset
+- - - libx264-lossless_ultrafast.avpreset
+- - - libx264-fast.avpreset
+- - - libx264-faster.avpreset
+- - - libx264-slower.avpreset
+- - - libx264-veryfast.avpreset
+- - - libvpx-720p50_60.avpreset
+- - - libx264-faster_firstpass.avpreset
+- - - libx264-superfast_firstpass.avpreset
+- - - libx264-fast_firstpass.avpreset
+- - - libx264-medium_firstpass.avpreset
+- - - libx264-lossless_medium.avpreset
+- - - libvpx-1080p.avpreset
+- - - libx264-ultrafast_firstpass.avpreset
+- - - libx264-lossless_slower.avpreset
+- - - libx264-lossless_fast.avpreset
+- - - libx264-ultrafast.avpreset
+- - man
+- - - man1
+- - - - avprobe.1
+- - - - avconv.1
+- lib
+- - libavdevice.a
+- - libavcodec.a
+- - libavfilter.a
+- - libavresample.a
+- - libswscale.a
+- - libavutil.a
+- - libavformat.a
+- - pkgconfig
+- - - libavresample.pc
+- - - libavdevice.pc
+- - - libswscale.pc
+- - - libavcodec.pc
+- - - libavfilter.pc
+- - - libavutil.pc
+- - - libavformat.pc
