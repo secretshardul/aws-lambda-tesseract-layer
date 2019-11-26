@@ -6,6 +6,13 @@ FROM lambci/lambda-base:build
 ARG LEPTONICA_VERSION=1.78.0
 ARG TESSERACT_VERSION=4.1.0
 ARG AUTOCONF_ARCHIVE_VERSION=2017.09.28
+ARG GHOSTSCRIPT_VERSION=ghostscript-9.50
+ARG QPDF_VERSION=release-qpdf-9.1.0
+ARG JBIG2ENC_VERSION=0.29
+ARG LIBIMAGEQUANT_VERSION=2.12.5
+ARG PNGQUANT_VERSION=2.12.1
+ARG UNPAPER_VERSION=unpaper-6.1
+
 ARG TMP_BUILD=/tmp
 ARG TESSERACT=/opt/tesseract
 ARG LEPTONICA=/opt/leptonica
@@ -13,9 +20,15 @@ ARG LEPTONICA=/opt/leptonica
 ARG GHOSTSCRIPT=/opt/ghostscript
 ARG QPDF=/opt/qpdf
 ARG JBIG2ENC=/opt/jbig2enc
+ARG LIBIMAGEQUANT=/opt/libimagequant
 ARG PNGQUANT=/opt/pngquant
 ARG UNPAPER=/opt/unpaper
 ARG DIST=/opt/build-dist
+
+ARG TESSERACT_DATA_SUFFIX=_fast
+ARG TESSERACT_DATA_VERSION=4.0.0
+
+
 # change OCR_LANG to enable the layer for different languages
 # ARG ind="san hin urd pan mar guj asm ben ori kan tel tam mal sin nep bod dzo"
 # ARG middle="pus ara fas tur aze aze_cyrl kat kat_old heb kur syr"
@@ -29,8 +42,6 @@ ARG DIST=/opt/build-dist
 # languages to skip: $ eurasia ukr bel bos bul hrv mkd ron slk slv sqi srp srp_latn
 # ARG OCR_LANG=deu
 # change TESSERACT_DATA_SUFFIX to use different datafiles (options: "_best", "_fast" and "")
-ARG TESSERACT_DATA_SUFFIX=_fast
-ARG TESSERACT_DATA_VERSION=4.0.0
 
 RUN yum makecache fast; yum clean all && yum -y update && yum -y upgrade; yum clean all && \
     yum install -y yum-plugin-ovl; yum clean all && yum -y groupinstall "Development Tools"; yum clean all
@@ -61,19 +72,17 @@ RUN curl -L https://github.com/tesseract-ocr/tesseract/archive/${TESSERACT_VERSI
 #ghostscript, qpdf, jbig2enc, pngquant, unpaper
 # --disable-compile-inits --with-x --with-drivers=ALL --without-luratech --with-libiconv=gnu --prefix=/usr/local
 WORKDIR ${TMP_BUILD}/ghostscript-build
-RUN curl -L https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs950/ghostscript-9.50.tar.gz | tar xz && \
-    cd ghostscript-9.50 && \
+RUN curl -L https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs950/${GHOSTSCRIPT_VERSION}.tar.gz | tar xz && \
+    cd ${GHOSTSCRIPT_VERSION} && \
     ./autogen.sh && \
-    PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
-    ./configure  --prefix=${GHOSTSCRIPT} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib && \
+    ./configure  --prefix=${GHOSTSCRIPT}  && \
     make && make install 
 
 WORKDIR ${TMP_BUILD}/qpdf-build    
-RUN curl -L https://github.com/qpdf/qpdf/archive/release-qpdf-9.1.0.tar.gz | tar xz && \
-    cd qpdf-release-qpdf-9.1.0 && \
+RUN curl -L https://github.com/qpdf/qpdf/archive/${QPDF_VERSION}.tar.gz | tar xz && \
+    cd qpdf-${QPDF_VERSION} && \
     ./autogen.sh && \
-    PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
-    ./configure  --prefix=${QPDF} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib && \
+    ./configure  --prefix=${QPDF} && \
     make && make install 
 
 RUN echo "showing leptonica library" && \
@@ -84,28 +93,27 @@ RUN echo "showing leptonica library" && \
 # PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
 # --prefix=${JBIG2ENC} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib  && \
 WORKDIR ${TMP_BUILD}/jbig2enc-build  
-RUN curl -L https://github.com/agl/jbig2enc/archive/0.29.tar.gz | tar xz && \
-    cd jbig2enc-0.29 && \
+RUN curl -L https://github.com/agl/jbig2enc/archive/${JBIG2ENC_VERSION}.tar.gz | tar xz && \
+    cd jbig2enc-${JBIG2ENC_VERSION} && \
     ./autogen.sh && \
-    env CPPFLAGS='-I/opt/leptonica/include/' LDFLAGS='-L/opt/leptonica/lib/' ./configure && \
+    env CPPFLAGS='-I/opt/leptonica/include/' LDFLAGS='-L/opt/leptonica/lib/' ./configure --prefix=${JBIG2ENC} && \
     make && make install 
 
 #-------------------------------------------------------------------------------------------
 
+# env CPPFLAGS='-I/opt/libimagequant/include/' LDFLAGS='-L/opt/libimagequant/lib/' 
+# --with-libimagequant='/opt/libimagequant/include/' 
 WORKDIR ${TMP_BUILD}/pngquant-build  
-RUN curl -L https://github.com/kornelski/pngquant/archive/2.12.1.tar.gz | tar xz && \
-    cd pngquant-2.12.1 && \
-    ./autogen.sh && \
-    PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
-    ./configure  --prefix=${PNGQUANT} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib && \
+RUN curl -L https://github.com/kornelski/pngquant/archive/${PNGQUANT_VERSION}.tar.gz | tar xz && \
+    curl -L https://github.com/ImageOptim/libimagequant/archive/${LIBIMAGEQUANT_VERSION}.tar.gz | tar xz && \
+    cd pngquant-${PNGQUANT_VERSION} && \
+    ./configure  --prefix=${PNGQUANT} --with-libimagequant=../libimagequant-${LIBIMAGEQUANT_VERSION} &&  \
     make && make install 
 
 WORKDIR ${TMP_BUILD}/unpaper-build  
-RUN curl -L https://github.com/Flameeyes/unpaper/archive/unpaper-6.1.tar.gz | tar xz && \
-    cd unpaper-unpaper-6.1 && \
-    ./autogen.sh && \
-    PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
-    ./configure  --prefix=${UNPAPER} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib && \
+RUN curl -L https://github.com/Flameeyes/unpaper/archive/${UNPAPER_VERSION}.tar.gz | tar xz && \
+    cd unpaper-${UNPAPER_VERSION} && \
+    ./configure  --prefix=${UNPAPER} CFLAGS="-O2 -march=native -pipe -flto" && \
     make && make install 
     
 
