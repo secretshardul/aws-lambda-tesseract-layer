@@ -144,17 +144,19 @@ RUN curl -L https://github.com/Flameeyes/unpaper/archive/${UNPAPER_VERSION}.tar.
 
 # $(DIST) gives root
 #ghostscript, qpdf, jbig2enc, pngquant, libav, unpaper
+# rsync instead of cp to skip folder copy
+# 
 WORKDIR /opt 
 RUN mkdir -p ${DIST}/lib && mkdir -p ${DIST}/bin && \
     cp ${TESSERACT}/bin/tesseract ${DIST}/bin/ && \
     cp ${TESSERACT}/lib/libtesseract.so.4  ${DIST}/lib/ && \
     cp ${LEPTONICA}/lib/liblept.so.5 ${DIST}/lib/liblept.so.5 && \
     cp ${GHOSTSCRIPT}/bin/* ${DIST}/bin/ && \
-    cp ${QPDF}/bin/* ${DIST}/bin/ && cp ${QPDF}/lib/* ${DIST}/lib/ && \
+    cp ${QPDF}/bin/* ${DIST}/bin/ && rsync -av ${QPDF}/lib/* ${DIST}/lib/ --exclude ${QPDF}/lib/pkgconfig && \
     cp ${JBIG2ENC}/bin/* ${DIST}/bin/ && cp ${JBIG2ENC}/lib/* ${DIST}/lib/ && \
-    cp ${PNGQUANT}/bin/* ${DIST}/bin/ && cp ${PNGQUANT}/lib/* ${DIST}/lib/ && \
-    cp ${LIBAV}/bin/* ${DIST}/bin/ && cp ${LIBAV}/lib/* ${DIST}/lib/ && \
-    cp ${UNPAPER}/bin/* ${DIST}/bin/ && cp ${UNPAPER}/lib/* ${DIST}/lib/ && \
+    cp ${PNGQUANT}/bin/* ${DIST}/bin/ && \
+    cp ${LIBAV}/bin/* ${DIST}/bin/ && rsync -av ${LIBAV}/lib/* ${DIST}/lib/ --exclude ${LIBAV}/lib/pkgconfig && \
+    cp ${UNPAPER}/bin/* ${DIST}/bin/ && \
     cp /usr/lib64/libwebp.so.4 ${DIST}/lib/ && \
     #for other libs
     cp /usr/lib64/libgif.so ${DIST}/lib/ && \
