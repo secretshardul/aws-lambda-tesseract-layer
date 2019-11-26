@@ -9,6 +9,12 @@ ARG AUTOCONF_ARCHIVE_VERSION=2017.09.28
 ARG TMP_BUILD=/tmp
 ARG TESSERACT=/opt/tesseract
 ARG LEPTONICA=/opt/leptonica
+#ghostscript, qpdf, jbig2enc, pngquant, unpaper
+ARG GHOSTSCRIPT=/opt/ghostscript
+ARG QPDF=/opt/qpdf
+ARG JBIG2ENC=/opt/jbig2enc
+ARG PNGQUANT=/opt/pngquant
+ARG UNPAPER=/opt/unpaper
 ARG DIST=/opt/build-dist
 # change OCR_LANG to enable the layer for different languages
 # ARG ind="san hin urd pan mar guj asm ben ori kan tel tam mal sin nep bod dzo"
@@ -36,17 +42,6 @@ RUN yum -y install gcc gcc-c++ make autoconf aclocal automake libtool \
     rpm -i http://mirror.centos.org/centos/8/AppStream/x86_64/os/Packages/giflib-5.1.4-3.el8.x86_64.rpm && \ 
     rpm -i http://mirror.centos.org/centos/8/PowerTools/x86_64/os/Packages/giflib-devel-5.1.4-3.el8.x86_64.rpm
 
-# dependencies for OCRMYPDF
-RUN rpm -i http://mirror.centos.org/centos/8/AppStream/x86_64/os/Packages/ghostscript-9.25-2.el8_0.3.x86_64.rpm \
-    http://mirror.centos.org/centos/8/AppStream/x86_64/os/Packages/qpdf-7.1.1-7.el8.x86_64.rpm && \
-    git clone https://github.com/agl/jbig2enc > jbig2enc.zip && \
-    unzip jbig2enc.zip && rm -r jbig2enc.zip && \
-    cd jbig2enc && \
-    ./autogen.sh && \
-    ./configure && make && \
-    make install && cd .. && \
-    yum install pngquant unpaper
-
 # training tools removed:  pango-devel cairo-devel libicu-devel
 WORKDIR ${TMP_BUILD}/leptonica-build
 RUN curl -L https://github.com/DanBloomberg/leptonica/releases/download/${LEPTONICA_VERSION}/leptonica-${LEPTONICA_VERSION}.tar.gz | tar xz && cd ${TMP_BUILD}/leptonica-build/leptonica-${LEPTONICA_VERSION} && \
@@ -63,11 +58,83 @@ RUN curl -L https://github.com/tesseract-ocr/tesseract/archive/${TESSERACT_VERSI
     cd tesseract-${TESSERACT_VERSION} && ./autogen.sh  && PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
     ./configure --prefix=${TESSERACT} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib --disable-openmp 'CXXFLAGS=-g -O2 -fno-math-errno -Wall -Wextra -Wpedantic' && make && make install
 
-WORKDIR /opt
+#ghostscript, qpdf, jbig2enc, pngquant, unpaper
+# --disable-compile-inits --with-x --with-drivers=ALL --without-luratech --with-libiconv=gnu --prefix=/usr/local
+WORKDIR ${TMP_BUILD}/ghostscript-build
+RUN curl -L https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs950/ghostscript-9.50.tar.gz > ghostscript.tar.gz && \
+    tar -zxvf ghostscript.tar.gz && \
+    cd ghostscript-9.50 && \
+    ./autogen.sh && \
+    PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
+    ./configure  --prefix=${GHOSTSCRIPT} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib && \
+    make && make install && \
+    cd .. && rm -r ghostscript.tar.gz ghostscript-9.50  
+
+WORKDIR ${TMP_BUILD}/qpdf-build    
+RUN curl -L https://github.com/qpdf/qpdf/archive/release-qpdf-9.1.0.tar.gz > qpdf-release-qpdf-9.1.0.tar.gz && \
+    tar -zxvf qpdf-release-qpdf-9.1.0.tar.gz && \
+    cd qpdf-release-qpdf-9.1.0 && \
+    ./autogen.sh && \
+    PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
+    ./configure  --prefix=${QPDF} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib && \
+    make && make install && \
+    cd .. && rm -r qpdf-release-qpdf-9.1.0.tar.gz qpdf-release-qpdf-9.1.0  
+
+WORKDIR ${TMP_BUILD}/jbig2enc-build  
+RUN curl -L https://github.com/agl/jbig2enc/archive/0.29.tar.gz > jbig2enc-0.29.tar.gz && \
+    tar -zxvf jbig2enc-0.29.tar.gz && \
+    cd jbig2enc-0.29 && \
+    ./autogen.sh && \
+    PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
+    ./configure  --prefix=${JBIG2ENC} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib && \
+    make && make install && \
+    cd .. && rm -r jbig2enc-0.29.tar.gz jbig2enc-0.29 
+
+WORKDIR ${TMP_BUILD}/pngquant-build  
+RUN curl -L https://github.com/kornelski/pngquant/archive/2.12.1.tar.gz > pngquant-2.12.1.tar.gz && \
+    tar -zxvf pngquant-2.12.1.tar.gz && \
+    cd pngquant-2.12.1 && \
+    ./autogen.sh && \
+    PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
+    ./configure  --prefix=${PNGQUANT} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib && \
+    make && make install && \
+    cd .. && rm -r pngquant-2.12.1.tar.gz pngquant-2.12.1 
+
+WORKDIR ${TMP_BUILD}/unpaper-build  
+RUN curl -L https://github.com/Flameeyes/unpaper/archive/unpaper-6.1.tar.gz > unpaper-unpaper-6.1.tar.gz && \
+    tar -zxvf unpaper-unpaper-6.1.tar.gz && \
+    cd unpaper-unpaper-6.1 && \
+    ./autogen.sh && \
+    PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
+    ./configure  --prefix=${UNPAPER} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib && \
+    make && make install && \
+    cd .. && rm -r unpaper-unpaper-6.1.tar.gz unpaper-unpaper-6.1 
+    
+
+# RUN yum install qpdf && \
+#     git clone https://github.com/agl/jbig2enc > jbig2enc.zip && \
+#     unzip jbig2enc.zip && rm -r jbig2enc.zip && \
+#     cd jbig2enc && \
+#     ./autogen.sh && \
+#     ./configure && make && \
+#     make install && cd .. && \
+#     yum install pngquant unpaper
+
+#--------------------------------- copy to lib and bin--------------------
+
+
+# $(DIST) gives root
+#ghostscript, qpdf, jbig2enc, pngquant, unpaper
+WORKDIR /opt 
 RUN mkdir -p ${DIST}/lib && mkdir -p ${DIST}/bin && \
     cp ${TESSERACT}/bin/tesseract ${DIST}/bin/ && \
     cp ${TESSERACT}/lib/libtesseract.so.4  ${DIST}/lib/ && \
     cp ${LEPTONICA}/lib/liblept.so.5 ${DIST}/lib/liblept.so.5 && \
+    cp ${GHOSTSCRIPT}/bin/* ${DIST}/bin/ && cp ${GHOSTSCRIPT}/lib/* ${DIST}/lib/ && \
+    cp ${QPDF}/bin/* ${DIST}/bin/ && cp ${QPDF}/lib/* ${DIST}/lib/ && \
+    cp ${JBIG2ENC}/bin/* ${DIST}/bin/ && cp ${JBIG2ENC}/lib/* ${DIST}/lib/ && \
+    cp ${PNGQUANT}/bin/* ${DIST}/bin/ && cp ${PNGQUANT}/lib/* ${DIST}/lib/ && \
+    cp ${UNPAPER}/bin/* ${DIST}/bin/ && cp ${UNPAPER}/lib/* ${DIST}/lib/ && \
     cp /usr/lib64/libwebp.so.4 ${DIST}/lib/ && \
     #for other libs
     cp /usr/lib64/libgif.so ${DIST}/lib/ && \
@@ -86,8 +153,7 @@ RUN curl -L https://github.com/tesseract-ocr/tessconfigs/archive/master.zip > ma
     unzip master.zip && mv tessconfigs-master/* . && \
     rm -r master.zip tessconfigs-master
 
-# pip ocrmypdf
-RUN pip3 install --user ocrmypdf    
+# python dependencies in separate layer
 # need tessconfig here
 # wget,
 # unzip master.zip
