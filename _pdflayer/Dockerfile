@@ -149,7 +149,7 @@ RUN mkdir -p ${DIST}/lib && mkdir -p ${DIST}/bin && \
     cp ${TESSERACT}/bin/tesseract ${DIST}/bin/ && \
     cp ${TESSERACT}/lib/libtesseract.so.4  ${DIST}/lib/ && \
     cp ${LEPTONICA}/lib/liblept.so.5 ${DIST}/lib/liblept.so.5 && \
-    cp ${GHOSTSCRIPT}/bin/* ${DIST}/bin/ && cp ${GHOSTSCRIPT}/lib/* ${DIST}/lib/ && \
+    cp ${GHOSTSCRIPT}/bin/* ${DIST}/bin/ && \
     cp ${QPDF}/bin/* ${DIST}/bin/ && cp ${QPDF}/lib/* ${DIST}/lib/ && \
     cp ${JBIG2ENC}/bin/* ${DIST}/bin/ && cp ${JBIG2ENC}/lib/* ${DIST}/lib/ && \
     cp ${PNGQUANT}/bin/* ${DIST}/bin/ && cp ${PNGQUANT}/lib/* ${DIST}/lib/ && \
