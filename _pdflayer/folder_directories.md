@@ -1,6 +1,4 @@
-In /opt/leptonica
-showing leptonica library
-.
+1. In /opt/leptonica
 - include
 - - leptonica
 - - - endianness.h
@@ -54,10 +52,7 @@ showing leptonica library
 - - - lept.pc
 - - liblept.a
 
-In /opt/libimagequant
-
-showing libimagequant library
-.
+2. /opt/libimagequant
 - include
 - - libimagequant.h
 - lib
@@ -67,9 +62,433 @@ showing libimagequant library
 - - - imagequant.pc
 - - libimagequant.so.0
 
-/opt/libav
-showing libav library
+3. /opt/ghostscript
+- bin
+- - dvipdf
+- - pfbtopfa
+- - ps2pdfwr
+- - ps2pdf14
+- - gsdj500
+- - ps2ascii
+- - gsdj
+- - ps2pdf13
+- - ps2ps2
+- - gslp
+- - lprsetup.sh
+- - eps2eps
+- - ps2epsi
+- - gslj
+- - ps2pdf
+- - ps2pdf12
+- - pphs
+- - gsbj
+- - pdf2dsc
+- - gsnd
+- - pdf2ps
+- - pf2afm
+- - gs
+- - printafm
+- - ps2ps
+- - unix-lpr.sh
+- share
+- - ghostscript
+- - - 9.50
+- - - - lib
+- - - - - stcany_h.upp
+- - - - - bjc6000a1.upp
+- - - - - ras1.upp
+- - - - - dmp_init.ps
+- - - - - stc740ih.upp
+- - - - - gs_t_m.xbm
+- - - - - dnj750c.upp
+- - - - - gs_s.xbm
+- - - - - stc.upp
+- - - - - cid2code.ps
+- - - - - bjc610a3.upp
+- - - - - gs_m.xpm
+- - - - - Stp720p.upp
+- - - - - dmp_site.ps
+- - - - - image-qa.ps
+- - - - - ps2epsi.ps
+- - - - - stc600p.upp
+- - - - - gs_wl5_e.ps
+- - - - - viewmiff.ps
+- - - - - gs_m_m.xbm
+- - - - - st640ih.upp
+- - - - - gs_il2_e.ps
+- - - - - stc2s_h.upp
+- - - - - gslp.ps
+- - - - - stc600ih.upp
+- - - - - bjc610b3.upp
+- - - - - gs_wl1_e.ps
+- - - - - Stp870p.upp
+- - - - - stcolor.ps
+- - - - - ppath.ps
+- - - - - ras4.upp
+- - - - - ras24.upp
+- - - - - st640p.upp
+- - - - - bjc610b4.upp
+- - - - - viewgif.ps
+- - - - - ht_ccsto.ps
+- - - - - bjc610a0.upp
+- - - - - sharp.upp
+- - - - - pfbtopfa.ps
+- - - - - stc2.upp
+- - - - - acctest.ps
+- - - - - bj8gc12f.upp
+- - - - - font2pcl.ps
+- - - - - PDFX_def.ps
+- - - - - bjc610a6.upp
+- - - - - stc300bl.upp
+- - - - - Stc670p.upp
+- - - - - winmaps.ps
+- - - - - st640plg.upp
+- - - - - bj8oh06n.upp
+- - - - - gs_lgo_e.ps
+- - - - - cdj690.upp
+- - - - - traceimg.ps
+- - - - - zeroline.ps
+- - - - - cbjc600.ppd
+- - - - - jispaper.ps
+- - - - - bjc610b6.upp
+- - - - - stc600pl.upp
+- - - - - viewps2a.ps
+- - - - - ghostpdf.ppd
+- - - - - pf2afm.ps
+- - - - - stc500ph.upp
+- - - - - Stp870pl.upp
+- - - - - dnj750m.upp
+- - - - - PM820p.upp
+- - - - - gs_l_m.xbm
+- - - - - Stc680pl.upp
+- - - - - st640ihg.upp
+- - - - - PDFA_def.ps
+- - - - - bj8pp12f.upp
+- - - - - Stc740pl.upp
+- - - - - stc_h.upp
+- - - - - gs_ksb_e.ps
+- - - - - printafm.ps
+- - - - - cbjc800.ppd
+- - - - - bj8.rpd
+- - - - - align.ps
+- - - - - necp2x6.upp
+- - - - - stc1520h.upp
+- - - - - st640pl.upp
+- - - - - gsnup.ps
+- - - - - gs_s_m.xbm
+- - - - - bjc610a5.upp
+- - - - - stcany.upp
+- - - - - bjc610b2.upp
+- - - - - bjc610b8.upp
+- - - - - bjc610a7.upp
+- - - - - traceop.ps
+- - - - - prfont.ps
+- - - - - stc_l.upp
+- - - - - stc300bm.upp
+- - - - - PM760p.upp
+- - - - - escp_24.src
+- - - - - cdj550.upp
+- - - - - Stc777pl.upp
+- - - - - bj8pa06n.upp
+- - - - - stc800p.upp
+- - - - - stocht.ps
+- - - - - PM760pl.upp
+- - - - - ras8m.upp
+- - - - - pphs.ps
+- - - - - PM820pl.upp
+- - - - - cdj690ec.upp
+- - - - - docie.ps
+- - - - - rollconv.ps
+- - - - - Stc680p.upp
+- - - - - sipixa6.upp
+- - - - - stc2_h.upp
+- - - - - viewpbm.ps
+- - - - - st640pg.upp
+- - - - - stc640p.upp
+- - - - - gs_s.xpm
+- - - - - necp2x.upp
+- - - - - bjc610b7.upp
+- - - - - ras3.upp
+- - - - - stc500p.upp
+- - - - - Stc777p.upp
+- - - - - stc800ih.upp
+- - - - - bjc610a1.upp
+- - - - - viewjpeg.ps
+- - - - - Stc670pl.upp
+- - - - - bjc6000b1.upp
+- - - - - stc200_h.upp
+- - - - - Stc760pl.upp
+- - - - - ras32.upp
+- - - - - ps2ai.ps
+- - - - - stc300.upp
+- - - - - bjc610a2.upp
+- - - - - uninfo.ps
+- - - - - gs_m.xbm
+- - - - - gs_wl2_e.ps
+- - - - - gs_lgx_e.ps
+- - - - - bjc610b1.upp
+- - - - - gs_ce_e.ps
+- - - - - bj8ts06n.upp
+- - - - - lines.ps
+- - - - - gs_kanji.ps
+- - - - - gs_t.xbm
+- - - - - gs_t.xpm
+- - - - - s400b1.upp
+- - - - - s400a1.upp
+- - - - - stcinfo.ps
+- - - - - viewpcx.ps
+- - - - - mkcidfm.ps
+- - - - - gs_l.xbm
+- - - - - pdf2dsc.ps
+- - - - - Stc760p.upp
+- - - - - viewcmyk.ps
+- - - - - bj8hg12f.upp
+- - - - - Stc740p.upp
+- - - - - stc800pl.upp
+- - - - - gs_l.xpm
+- - - - - bjc610a8.upp
+- - - - - caption.ps
+- - - - - bjc610a4.upp
+- - - - - landscap.ps
+- - - - - Stp720pl.upp
+- - doc
+- - - ghostscript
+- - - - 9.50
+- - - - - SavedPages.htm
+- - - - - C-style.htm
+- - - - - Readme.htm
+- - - - - Drivers.htm
+- - - - - News.htm
+- - - - - gs-style.css
+- - - - - index.html
+- - - - - Psfiles.htm
+- - - - - images
+- - - - - - x-light.png
+- - - - - - ghostscript_logo.png
+- - - - - - Artifex_logo.png
+- - - - - - hamburger-light.png
+- - - - - - favicon.png
+- - - - - index.js
+- - - - - Ps-style.htm
+- - - - - COPYING
+- - - - - API.htm
+- - - - - VectorDevices.htm
+- - - - - Unix-lpr.htm
+- - - - - Fonts.htm
+- - - - - Make.htm
+- - - - - subclass.htm
+- - - - - sample_downscale_device.htm
+- - - - - Use.htm
+- - - - - Commprod.htm
+- - - - - Lib.htm
+- - - - - style.css
+- - - - - Ps2epsi.htm
+- - - - - DLL.htm
+- - - - - Source.htm
+- - - - - Language.htm
+- - - - - WhatIsGS.htm
+- - - - - Devices.htm
+- - - - - thirdparty.htm
+- - - - - Release.htm
+- - - - - gdevds32.c
+- - - - - Deprecated.htm
+- - - - - History9.htm
+- - - - - GS9_Color_Management.pdf
+- - - - - Install.htm
+- - - - - pscet_status.txt
+- - - - - Develop.htm
+- - man
+- - - man1
+- - - - gs.1
+- - - - gsdj.1
+- - - - eps2eps.1
+- - - - gslj.1
+- - - - gsbj.1
+- - - - ps2epsi.1
+- - - - pdf2ps.1
+- - - - ps2pdf14.1
+- - - - ps2pdfwr.1
+- - - - gslp.1
+- - - - ps2ascii.1
+- - - - pf2afm.1
+- - - - pfbtopfa.1
+- - - - printafm.1
+- - - - gsnd.1
+- - - - ps2pdf.1
+- - - - ps2ps.1
+- - - - gsdj500.1
+- - - - pdf2dsc.1
+- - - - ps2pdf12.1
+- - - - ps2pdf13.1
+- - - - dvipdf.1
+- - - de
+- - - - man1
+- - - - - eps2eps.1
+- - - - - pdf2ps.1
+- - - - - ps2pdf14.1
+- - - - - ps2ascii.1
+- - - - - printafm.1
+- - - - - gsnd.1
+- - - - - ps2pdf.1
+- - - - - ps2ps.1
+- - - - - pdf2dsc.1
+- - - - - ps2pdf12.1
+- - - - - ps2pdf13.1
+- - - - - dvipdf.1
+
+4. /opt/qpdf 
+- include
+- - qpdf
+- - - Pl_Discard.hh
+- - - Types.h
+- - - QPDFFormFieldObjectHelper.hh
+- - - BufferInputSource.hh
+- - - QPDFCryptoProvider.hh
+- - - Constants.h
+- - - Pl_Concatenate.hh
+- - - QPDFTokenizer.hh
+- - - QPDFCryptoImpl.hh
+- - - Pl_QPDFTokenizer.hh
+- - - qpdf-c.h
+- - - QPDFXRefEntry.hh
+- - - QPDFWriter.hh
+- - - QPDFSystemError.hh
+- - - Pl_Buffer.hh
+- - - Buffer.hh
+- - - QPDFOutlineDocumentHelper.hh
+- - - PointerHolder.hh
+- - - QPDFObjectHandle.hh
+- - - QUtil.hh
+- - - QPDFOutlineObjectHelper.hh
+- - - QPDFAcroFormDocumentHelper.hh
+- - - Pl_Count.hh
+- - - QPDFObjectHelper.hh
+- - - QPDFObjGen.hh
+- - - QIntC.hh
+- - - QPDFAnnotationObjectHelper.hh
+- - - RandomDataProvider.hh
+- - - InputSource.hh
+- - - QPDFObject.hh
+- - - ClosedFileInputSource.hh
+- - - QPDF.hh
+- - - QPDFExc.hh
+- - - Pipeline.hh
+- - - Pl_StdioFile.hh
+- - - QPDFPageLabelDocumentHelper.hh
+- - - Pl_RunLength.hh
+- - - QTC.hh
+- - - Pl_DCT.hh
+- - - DLL.h
+- - - JSON.hh
+- - - QPDFDocumentHelper.hh
+- - - Pl_Flate.hh
+- - - QPDFNumberTreeObjectHelper.hh
+- - - QPDFPageDocumentHelper.hh
+- - - QPDFNameTreeObjectHelper.hh
+- - - FileInputSource.hh
+- - - QPDFPageObjectHelper.hh
+- bin
+- - fix-qdf
+- - zlib-flate
+- - qpdf
+- share
+- - doc
+- - - qpdf
+- - - - stylesheet.css
+- - man
+- - - man1
+- - - - fix-qdf.1
+- - - - zlib-flate.1
+- - - - qpdf.1
+- lib
+- - libqpdf.la
+- - libqpdf.so.26.1.0
+- - libqpdf.a
+- - libqpdf.so.26
+- - pkgconfig
+- - - libqpdf.pc
+- - libqpdf.so
+
+5. /opt/jbig2enc
+- include
+- - jbig2comparator.h
+- - jbig2sym.h
+- - jbig2arith.h
+- - jbig2segments.h
+- - jbig2structs.h
+- bin
+- - jbig2
+- - pdf.py
+- share
+- - doc
+- - - jbig2enc-0.28
+- - - - AUTHORS
+- - - - COPYING
+- - - - PATENTS
+- - - - INSTALL
+- - - - ChangeLog
+- - - - README.md
+- - - - jbig2enc.html
+- - - - NEWS
+- lib
+- - libjbig2enc.a
+- - libjbig2enc.so
+- - libjbig2enc.la
+- - libjbig2enc.so.0
+- - libjbig2enc.so.0.0.28
+6. /opt/pngquant
+pngquant library
 .
+- bin
+- - pngquant
+- share
+- - man
+- - - man1
+- - - - pngquant.1
+
+7. /opt/unpaper
+- bin
+- - unpaper
+- share
+- - doc
+- - - unpaper
+- - - - AUTHORS
+- - - - file-formats.md
+- - - - COPYING
+- - - - img
+- - - - - input-pages.png
+- - - - - mask-center.png
+- - - - - documentation.odg
+- - - - - deskew.png
+- - - - - deskew-detail2.png
+- - - - - multiple-output-files.png
+- - - - - blackfilter.png
+- - - - - deskew-detail1.png
+- - - - - layout-templates.png
+- - - - - multiple-input-files.png
+- - - - - sheetspages.png
+- - - - - blurfilter.png
+- - - - - blurfilter-detail.png
+- - - - - output-pages.png
+- - - - - border-scan.png
+- - - - - standard-deviation.png
+- - - - - mask-scan-detail2.png
+- - - - - blackfilter-detail.png
+- - - - - mask-scan-detail1.png
+- - - - - processing-order.png
+- - - - - border-align.png
+- - - - - noisefilter.png
+- - - - - mask-scan.png
+- - - - image-processing.md
+- - - - basic-concepts.md
+- - - - README.md
+- - - - NEWS
+- - man
+- - - man1
+- - - - unpaper.1
+
+
+8. /opt/libav
 - include
 - - libavresample
 - - - avresample.h

@@ -141,32 +141,42 @@ RUN curl -L https://github.com/Flameeyes/unpaper/archive/${UNPAPER_VERSION}.tar.
 
 #--------------------------------- copy to lib and bin--------------------
 
-
 # $(DIST) gives root
 #ghostscript, qpdf, jbig2enc, pngquant, libav, unpaper
 # rsync instead of cp to skip folder copy
 # cp ${LIBAV}/bin/* ${DIST}/bin/ && rsync -av ${LIBAV}/lib/* ${DIST}/lib/ --exclude ${LIBAV}/lib/pkgconfig && \
+# try without libs
+# cp ${GHOSTSCRIPT}/bin/* ${DIST}/bin/ && \
+# cp ${QPDF}/bin/* ${DIST}/bin/ && rsync -av ${QPDF}/lib/* ${DIST}/lib/ --exclude ${QPDF}/lib/pkgconfig/ && \
+# cp ${JBIG2ENC}/bin/* ${DIST}/bin/ && cp ${JBIG2ENC}/lib/* ${DIST}/lib/ && \
+# cp ${PNGQUANT}/bin/* ${DIST}/bin/ && \
+# cp ${UNPAPER}/bin/* ${DIST}/bin/ && \ 
+# issues: qpdf(libqpdf.so.26), jbig2enc(needs libpng,libpng12.so.0), pngquant(libpng12,libpng12.so.0)
+
 WORKDIR /opt 
 RUN mkdir -p ${DIST}/lib && mkdir -p ${DIST}/bin && \
     cp ${TESSERACT}/bin/tesseract ${DIST}/bin/ && \
     cp ${TESSERACT}/lib/libtesseract.so.4  ${DIST}/lib/ && \
     cp ${LEPTONICA}/lib/liblept.so.5 ${DIST}/lib/liblept.so.5 && \
-    cp ${GHOSTSCRIPT}/bin/* ${DIST}/bin/ && \
-    cp ${QPDF}/bin/* ${DIST}/bin/ && rsync -av ${QPDF}/lib/* ${DIST}/lib/ --exclude ${QPDF}/lib/pkgconfig && \
-    cp ${JBIG2ENC}/bin/* ${DIST}/bin/ && cp ${JBIG2ENC}/lib/* ${DIST}/lib/ && \
-    cp ${PNGQUANT}/bin/* ${DIST}/bin/ && \
-    cp ${UNPAPER}/bin/* ${DIST}/bin/ && \
+    cp ${GHOSTSCRIPT}/bin/gs ${DIST}/bin/ && \
+    cp ${QPDF}/bin/qpdf ${DIST}/bin/ && cp ${QPDF}/lib/libqpdf.so* ${DIST}/lib/ && \
+    cp ${JBIG2ENC}/bin/jbig2 ${DIST}/bin/ && cp ${JBIG2ENC}/lib/libjbig2enc.so ${DIST}/lib/ && \
+    # try removing libjbig2enc.so
+    cp ${PNGQUANT}/bin/pngquant ${DIST}/bin/ && \
+    cp ${UNPAPER}/bin/unpaper ${DIST}/bin/ && \
     cp /usr/lib64/libwebp.so.4 ${DIST}/lib/ && \
     #for other libs
     cp /usr/lib64/libgif.so ${DIST}/lib/ && \
     cp /usr/lib64/libgif.so.7 ${DIST}/lib/ && \
+    # for jbig2enc and pngquant
+    cp /usr/lib64/libpng* ${DIST}/lib/ && \
     # cp /usr/lib64/freetype.so.6 ${DIST}/lib/ && \
     echo -e "LEPTONICA_VERSION=${LEPTONICA_VERSION}\nTESSERACT_VERSION=${TESSERACT_VERSION}\nTESSERACT_DATA_FILES=tessdata${TESSERACT_DATA_SUFFIX}/${TESSERACT_DATA_VERSION}" > ${DIST}/TESSERACT-README.md && \
     find ${DIST}/lib -name '*.so*' | xargs strip -s
 
 WORKDIR ${DIST}/tesseract/share/tessdata
-RUN curl -L https://github.com/tesseract-ocr/tessdata${TESSERACT_DATA_SUFFIX}/raw/${TESSERACT_DATA_VERSION}/osd.traineddata > osd.traineddata && \
-    curl -L https://github.com/tesseract-ocr/tessdata${TESSERACT_DATA_SUFFIX}/raw/${TESSERACT_DATA_VERSION}/eng.traineddata > eng.traineddata 
+# OSD not needed
+RUN curl -L https://github.com/tesseract-ocr/tessdata${TESSERACT_DATA_SUFFIX}/raw/${TESSERACT_DATA_VERSION}/eng.traineddata > eng.traineddata 
 # RUN for OCR_LANG in ${LANGS}; do \    
 #     curl -L https://github.com/tesseract-ocr/tessdata${TESSERACT_DATA_SUFFIX}/raw/${TESSERACT_DATA_VERSION}/${OCR_LANG}.traineddata > ${OCR_LANG}.traineddata \
 #     ;done && \
