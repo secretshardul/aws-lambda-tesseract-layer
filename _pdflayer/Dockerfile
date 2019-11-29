@@ -1,13 +1,13 @@
 FROM lambci/lambda-base:build
 # FROM lambci/lambda:python3.8
-# RUN pip3 --version
+RUN python3 --version
 
 
 ARG LEPTONICA_VERSION=1.78.0
 ARG TESSERACT_VERSION=4.1.0
 ARG AUTOCONF_ARCHIVE_VERSION=2017.09.28
 ARG GHOSTSCRIPT_VERSION=ghostscript-9.50
-ARG QPDF_VERSION=release-qpdf-9.1.0
+ARG QPDF_VERSION=9.1.0
 ARG JBIG2ENC_VERSION=0.29
 ARG LIBIMAGEQUANT_VERSION=2.12.5
 ARG PNGQUANT_VERSION=2.12.1
@@ -81,15 +81,13 @@ RUN curl -L https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/downl
     make && make install 
 
 WORKDIR ${TMP_BUILD}/qpdf-build    
-RUN curl -L https://github.com/qpdf/qpdf/archive/${QPDF_VERSION}.tar.gz | tar xz && \
+RUN curl -L https://github.com/qpdf/qpdf/releases/download/release-qpdf-${QPDF_VERSION}/qpdf-${QPDF_VERSION}.tar.gz | tar xz && \
     cd qpdf-${QPDF_VERSION} && \
     ./autogen.sh && \
-    ./configure  --prefix=${QPDF} && \
+    ./configure  --prefix=${QPDF} && --disable-static && \
     make && make install 
 
-RUN echo "showing leptonica library" && \
-    cd /opt/leptonica && \
-    find | sed 's|[^/]*/|- |g'
+RUN qpdf && tesseract
 
 #--------------------------- jbig2enc issue----------------------------------------------------
 # PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
@@ -184,10 +182,21 @@ RUN curl -L https://github.com/tesseract-ocr/tessconfigs/archive/master.zip > ma
     unzip master.zip && mv tessconfigs-master/* . && \
     rm -r master.zip tessconfigs-master
 
-# python dependencies in separate layer
-# need tessconfig here
-# wget,
-# unzip master.zip
-# mv tessconfigs-master/* .
-# rm -r master.zip tessconfigs-master
+# python dependencies 
+WORKDIR ${DIST}/python
+# RUN curl -L https://github.com/secretshardul/leptonica_find/archive/master.zip > master.zip && \
+#     unzip master.zip && cp leptonica_find-master/main.py ./ && \
+#     rm -r leptonica_find-master master.zip && \
+# # RUN cd /opt/liblept && ls
+#     python3 -m venv myenv && \
+#     source myenv/bin/activate && \
+#     pip3 install --retries 200 --timeout 220 ocrmypdf && \
+#     python3 main.py
+# RUN pip3 install ocrmypdf --target .
+    # pip3 install --retries 20 --timeout 120 cffi --target . --upgrade
+    # cd cffi && \
+    # python setup.py build --force && python setup.py install
+
+
+
 WORKDIR /var/task
