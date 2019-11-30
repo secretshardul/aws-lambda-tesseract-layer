@@ -1,7 +1,46 @@
-FROM lambci/lambda-base:build
+# FROM lambci/lambda-base:build
+FROM amazonlinux:2
 # FROM lambci/lambda:python3.8
-RUN python3 --version
 
+
+ARG GCC_VERSION=9.2.0
+
+# development tools not present from start
+RUN yum -y groupinstall "Development Tools"
+RUN gcc --version && cpp --version && make --version && autoconf --version && aclocal --version && automake --version && libtool --version
+
+# RUN yum makecache fast; yum clean all && yum -y update && yum -y upgrade; yum clean all && \
+#     yum install -y yum-plugin-ovl; yum clean all && yum -y groupinstall "Development Tools"; yum clean all && \
+#     yum --version
+
+# openssl for pip issue, yasm for libav
+RUN yum -y install libjpeg-devel libpng-devel libtiff-devel zlib-devel openssl-devel yasm\ 
+    libzip-devel freetype-devel lcms2-devel libwebp-devel \
+    tcl-devel tk-devel epel-release ; yum clean all && \
+    rpm -i http://mirror.centos.org/centos/8/AppStream/x86_64/os/Packages/giflib-5.1.4-3.el8.x86_64.rpm && \ 
+    rpm -i http://mirror.centos.org/centos/8/PowerTools/x86_64/os/Packages/giflib-devel-5.1.4-3.el8.x86_64.rpm
+
+
+#------------------------------------gcc and pip install issue
+# old gcc and cpp version 
+# gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-28) cpp (GCC) 4.8.5 20150623 (Red Hat 4.8.5-28)
+# make- 3.82, autoconf- 2.69, aclocal- 1.13, automake- 1.13, libtool- 2.4
+# update these
+# amz2 has newer version, try without make
+# WORKDIR ${TMP_BUILD}/gcc-build
+# RUN gcc --version && cpp --version && make --version && autoconf --version && aclocal --version && automake --version && libtool --version && \
+#     yum -y install  gmp  gmp-devel  mpfr  mpfr-devel  libmpc  libmpc-devel && \
+#     curl -L http://mirrors.concertpass.com/gcc/releases/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.gz | tar xz && \
+#     cd gcc-${GCC_VERSION} && ./configure --enable-languages=c,c++ --disable-multilib && make && make install 
+    
+
+ARG PYTHON_VERSION=3.8.0
+ARG TMP_BUILD=/tmp
+WORKDIR ${TMP_BUILD}/python-build
+RUN curl -L https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz | tar xJ && \
+    cd Python-${PYTHON_VERSION} && ./configure --enable-optimizations && make && make altinstall 
+RUN python3.8 --version && pip3.8 --version
+# use python3.8 instead of python3
 
 ARG LEPTONICA_VERSION=1.78.0
 ARG TESSERACT_VERSION=4.1.0
@@ -14,7 +53,6 @@ ARG PNGQUANT_VERSION=2.12.1
 ARG LIBAV_VERSION=12.3
 ARG UNPAPER_VERSION=unpaper-6.1
 
-ARG TMP_BUILD=/tmp
 ARG TESSERACT=/opt/tesseract
 ARG LEPTONICA=/opt/leptonica
 #ghostscript, qpdf, jbig2enc, pngquant, unpaper
@@ -30,46 +68,25 @@ ARG DIST=/opt/build-dist
 ARG TESSERACT_DATA_SUFFIX=_fast
 ARG TESSERACT_DATA_VERSION=4.0.0
 
-
-# change OCR_LANG to enable the layer for different languages
-# ARG ind="san hin urd pan mar guj asm ben ori kan tel tam mal sin nep bod dzo"
-# ARG middle="pus ara fas tur aze aze_cyrl kat kat_old heb kur syr"
-# #ARG eurasia="kaz kir tgk uzb uzb_cyrl uig"
-# ARG africa="afr amh swa tir"
-# ARG west="eng enm gle cym fra frm spa spa_old glg eus cat ita ita_old mlt lat ell grc por pol ces hun deu yid frk nld dan nor swe fin isl lav lit est rus" 
-# ARG east="chi_sim chi_sim_vert chi_tra chi_tra_vert kor kor_vert jpn jpn_vert"
-# ARG sea="mya msa ind jav tha lao vie khm tgl ceb"
-# ARG misc="equ chr hat iku epo"
-# ARG LANGS="$misc $ind $middle $africa $west $east $sea"
-# languages to skip: $ eurasia ukr bel bos bul hrv mkd ron slk slv sqi srp srp_latn
-# ARG OCR_LANG=deu
-# change TESSERACT_DATA_SUFFIX to use different datafiles (options: "_best", "_fast" and "")
-
-RUN yum makecache fast; yum clean all && yum -y update && yum -y upgrade; yum clean all && \
-    yum install -y yum-plugin-ovl; yum clean all && yum -y groupinstall "Development Tools"; yum clean all
-
-RUN yum -y install gcc gcc-c++ make autoconf aclocal automake libtool \
-    libjpeg-devel libpng-devel libtiff-devel zlib-devel \ 
-    libzip-devel freetype-devel lcms2-devel libwebp-devel \
-    tcl-devel tk-devel epel-release ; yum clean all && \
-    rpm -i http://mirror.centos.org/centos/8/AppStream/x86_64/os/Packages/giflib-5.1.4-3.el8.x86_64.rpm && \ 
-    rpm -i http://mirror.centos.org/centos/8/PowerTools/x86_64/os/Packages/giflib-devel-5.1.4-3.el8.x86_64.rpm
-
 # training tools removed:  pango-devel cairo-devel libicu-devel
 WORKDIR ${TMP_BUILD}/leptonica-build
 RUN curl -L https://github.com/DanBloomberg/leptonica/releases/download/${LEPTONICA_VERSION}/leptonica-${LEPTONICA_VERSION}.tar.gz | tar xz && cd ${TMP_BUILD}/leptonica-build/leptonica-${LEPTONICA_VERSION} && \
-    ./configure --prefix=${LEPTONICA} && make && make install && cp -r ./src/.libs /opt/liblept
+    ./configure --prefix=${LEPTONICA} --disable-dependency-tracking --disable-static --enable-fast-install --disable-dependency-tracking CFLAGS="-O2 -DNO_CONSOLE_IO"&& \
+    make && make install && cp -r ./src/.libs /opt/liblept
 
 RUN echo "/opt/leptonica/lib" > /etc/ld.so.conf.d/leptonica.conf && ldconfig
 
-WORKDIR ${TMP_BUILD}/autoconf-build
-RUN curl https://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-${AUTOCONF_ARCHIVE_VERSION}.tar.xz | tar xJ && \
-    cd autoconf-archive-${AUTOCONF_ARCHIVE_VERSION} && ./configure && make && make install && cp ./m4/* /usr/share/aclocal/
+# not needed, got newer version
+# WORKDIR ${TMP_BUILD}/autoconf-build
+# RUN curl https://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-${AUTOCONF_ARCHIVE_VERSION}.tar.xz | tar xJ && \
+#     cd autoconf-archive-${AUTOCONF_ARCHIVE_VERSION} && ./configure && make && make install && cp ./m4/* /usr/share/aclocal/
 
 WORKDIR ${TMP_BUILD}/tesseract-build
 RUN curl -L https://github.com/tesseract-ocr/tesseract/archive/${TESSERACT_VERSION}.tar.gz | tar xz && \
     cd tesseract-${TESSERACT_VERSION} && ./autogen.sh  && PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
-    ./configure --prefix=${TESSERACT} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib --disable-openmp 'CXXFLAGS=-g -O2 -fno-math-errno -Wall -Wextra -Wpedantic' && make && make install
+    ./configure --prefix=${TESSERACT} --with-extra-includes=/opt/leptonica/include --with-extra-libraries=/opt/leptonica/lib \
+    --disable-openmp 'CXXFLAGS=-g -O2 -fno-math-errno -Wall -Wextra -Wpedantic' --disable-dependency-tracking --disable-static --enable-fast-install && \
+    make && make install
 
 #ghostscript, qpdf, jbig2enc, pngquant, unpaper
 # --disable-compile-inits --with-x --with-drivers=ALL --without-luratech --with-libiconv=gnu --prefix=/usr/local
@@ -84,10 +101,25 @@ WORKDIR ${TMP_BUILD}/qpdf-build
 RUN curl -L https://github.com/qpdf/qpdf/releases/download/release-qpdf-${QPDF_VERSION}/qpdf-${QPDF_VERSION}.tar.gz | tar xz && \
     cd qpdf-${QPDF_VERSION} && \
     ./autogen.sh && \
-    ./configure  --prefix=${QPDF} && --disable-static && \
+    ./configure  --prefix=${QPDF} --disable-static  && \
     make && make install 
+# qpdf in ${QPDF}/bin/qpdf, tesseract in ${TESSERACT}/bin/tesseract
 
-RUN qpdf && tesseract
+# pikepdf worked without need of global-option. But qpdf itself can't be used except from its directory
+# WORKDIR ${DIST}/python
+# RUN python3.8 -m venv myenv && source myenv/bin/activate && \
+#     pip --version && \
+#     pip install pikepdf && \
+#     curl -L http://triggs.djvu.org/djvu-editions.com/BIBLES/DRV/Download.pdf > bible.pdf && \
+#     echo "import pikepdf" >> test.py && echo "my_pdf = pikepdf.Pdf.open('bible.pdf')" >> test.py && \
+#      echo "my_pdf.save('bible-saved.pdf')" >> test.py && python3.8 test.py && ls
+     
+     
+    # pip install --global-option=build_ext --global-option=-I${QPDF}/include --global-option=-L${QPDF}/lib  pikepdf 
+
+
+
+
 
 #--------------------------- jbig2enc issue----------------------------------------------------
 # PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
@@ -111,8 +143,7 @@ RUN curl -L https://github.com/kornelski/pngquant/archive/${PNGQUANT_VERSION}.ta
     make && make install 
 
 WORKDIR ${TMP_BUILD}/libav-build  
-RUN yum -y install yasm && \
-    curl -L https://github.com/libav/libav/archive/v${LIBAV_VERSION}.tar.gz | tar xz && \
+RUN curl -L https://github.com/libav/libav/archive/v${LIBAV_VERSION}.tar.gz | tar xz && \
     cd libav-${LIBAV_VERSION} && \
     ./configure  --prefix=${LIBAV} && \
     make && make install 
@@ -172,6 +203,21 @@ RUN mkdir -p ${DIST}/lib && mkdir -p ${DIST}/bin && \
     echo -e "LEPTONICA_VERSION=${LEPTONICA_VERSION}\nTESSERACT_VERSION=${TESSERACT_VERSION}\nTESSERACT_DATA_FILES=tessdata${TESSERACT_DATA_SUFFIX}/${TESSERACT_DATA_VERSION}" > ${DIST}/TESSERACT-README.md && \
     find ${DIST}/lib -name '*.so*' | xargs strip -s
 
+
+#--------------------------------------------tesseract lang setup---------------------------------------
+# change OCR_LANG to enable the layer for different languages
+# ARG ind="san hin urd pan mar guj asm ben ori kan tel tam mal sin nep bod dzo"
+# ARG middle="pus ara fas tur aze aze_cyrl kat kat_old heb kur syr"
+# #ARG eurasia="kaz kir tgk uzb uzb_cyrl uig"
+# ARG africa="afr amh swa tir"
+# ARG west="eng enm gle cym fra frm spa spa_old glg eus cat ita ita_old mlt lat ell grc por pol ces hun deu yid frk nld dan nor swe fin isl lav lit est rus" 
+# ARG east="chi_sim chi_sim_vert chi_tra chi_tra_vert kor kor_vert jpn jpn_vert"
+# ARG sea="mya msa ind jav tha lao vie khm tgl ceb"
+# ARG misc="equ chr hat iku epo"
+# ARG LANGS="$misc $ind $middle $africa $west $east $sea"
+# languages to skip: $ eurasia ukr bel bos bul hrv mkd ron slk slv sqi srp srp_latn
+# ARG OCR_LANG=deu
+# change TESSERACT_DATA_SUFFIX to use different datafiles (options: "_best", "_fast" and "")
 WORKDIR ${DIST}/tesseract/share/tessdata
 # OSD not needed
 RUN curl -L https://github.com/tesseract-ocr/tessdata${TESSERACT_DATA_SUFFIX}/raw/${TESSERACT_DATA_VERSION}/eng.traineddata > eng.traineddata 
@@ -181,6 +227,8 @@ RUN curl -L https://github.com/tesseract-ocr/tessdata${TESSERACT_DATA_SUFFIX}/ra
 RUN curl -L https://github.com/tesseract-ocr/tessconfigs/archive/master.zip > master.zip && \
     unzip master.zip && mv tessconfigs-master/* . && \
     rm -r master.zip tessconfigs-master
+#--------------------------------------------------------------------------------
+
 
 # python dependencies 
 WORKDIR ${DIST}/python
