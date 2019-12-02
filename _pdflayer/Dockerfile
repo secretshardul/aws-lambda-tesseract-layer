@@ -14,7 +14,7 @@ RUN gcc --version && cpp --version && make --version && autoconf --version && ac
 #     yum --version
 
 # openssl for pip issue, yasm for libav
-RUN yum -y install libjpeg-devel libpng-devel libtiff-devel zlib-devel openssl-devel yasm\ 
+RUN yum -y install libjpeg-devel libpng-devel libtiff-devel zlib-devel openssl-devel nasm libffi-devel \ 
     libzip-devel freetype-devel lcms2-devel libwebp-devel \
     tcl-devel tk-devel epel-release ; yum clean all && \
     rpm -i http://mirror.centos.org/centos/8/AppStream/x86_64/os/Packages/giflib-5.1.4-3.el8.x86_64.rpm && \ 
@@ -106,20 +106,6 @@ RUN curl -L https://github.com/qpdf/qpdf/releases/download/release-qpdf-${QPDF_V
 # qpdf in ${QPDF}/bin/qpdf, tesseract in ${TESSERACT}/bin/tesseract
 
 # pikepdf worked without need of global-option. But qpdf itself can't be used except from its directory
-# WORKDIR ${DIST}/python
-# RUN python3.8 -m venv myenv && source myenv/bin/activate && \
-#     pip --version && \
-#     pip install pikepdf && \
-#     curl -L http://triggs.djvu.org/djvu-editions.com/BIBLES/DRV/Download.pdf > bible.pdf && \
-#     echo "import pikepdf" >> test.py && echo "my_pdf = pikepdf.Pdf.open('bible.pdf')" >> test.py && \
-#      echo "my_pdf.save('bible-saved.pdf')" >> test.py && python3.8 test.py && ls
-     
-     
-    # pip install --global-option=build_ext --global-option=-I${QPDF}/include --global-option=-L${QPDF}/lib  pikepdf 
-
-
-
-
 
 #--------------------------- jbig2enc issue----------------------------------------------------
 # PKG_CONFIG_PATH=/opt/leptonica/lib/pkgconfig LIBLEPT_HEADERSDIR=/opt/leptonica/include \
@@ -128,7 +114,8 @@ WORKDIR ${TMP_BUILD}/jbig2enc-build
 RUN curl -L https://github.com/agl/jbig2enc/archive/${JBIG2ENC_VERSION}.tar.gz | tar xz && \
     cd jbig2enc-${JBIG2ENC_VERSION} && \
     ./autogen.sh && \
-    env CPPFLAGS='-I/opt/leptonica/include/' LDFLAGS='-L/opt/leptonica/lib/' ./configure --prefix=${JBIG2ENC} && \
+    env CPPFLAGS='-I/opt/leptonica/include/' LDFLAGS='-L/opt/leptonica/lib/' \
+    ./configure --prefix=${JBIG2ENC} && \
     make && make install 
 
 #-------------------------------------------------------------------------------------------
@@ -139,11 +126,11 @@ WORKDIR ${TMP_BUILD}/pngquant-build
 RUN curl -L https://github.com/kornelski/pngquant/archive/${PNGQUANT_VERSION}.tar.gz | tar xz && \
     curl -L https://github.com/ImageOptim/libimagequant/archive/${LIBIMAGEQUANT_VERSION}.tar.gz | tar xz && \
     cd pngquant-${PNGQUANT_VERSION} && \
-    ./configure  --prefix=${PNGQUANT} --with-libimagequant=../libimagequant-${LIBIMAGEQUANT_VERSION} &&  \
+    ./configure  --prefix=${PNGQUANT} --with-libimagequant=../libimagequant-${LIBIMAGEQUANT_VERSION} && \
     make && make install 
 
 WORKDIR ${TMP_BUILD}/libav-build  
-RUN curl -L https://github.com/libav/libav/archive/v${LIBAV_VERSION}.tar.gz | tar xz && \
+RUN  curl -L https://github.com/libav/libav/archive/v${LIBAV_VERSION}.tar.gz | tar xz && \
     cd libav-${LIBAV_VERSION} && \
     ./configure  --prefix=${LIBAV} && \
     make && make install 
@@ -151,11 +138,12 @@ RUN curl -L https://github.com/libav/libav/archive/v${LIBAV_VERSION}.tar.gz | ta
 #---------------unpaper issue----------------------------------
 # LIBAV_CFLAGS='-I/opt/libav/include' LIBAV_LIBS='-L/opt/libav/lib'
 WORKDIR ${TMP_BUILD}/unpaper-build  
+RUN yum -y install libxslt 
 RUN curl -L https://github.com/Flameeyes/unpaper/archive/${UNPAPER_VERSION}.tar.gz | tar xz && \
     cd unpaper-${UNPAPER_VERSION} && ls && \
     autoreconf -i && \
     PKG_CONFIG_PATH=${LIBAV}/lib/pkgconfig \
-    ./configure  --prefix=${UNPAPER} CFLAGS="-O2 -march=native -pipe -flto"  && \
+    ./configure  --prefix=${UNPAPER} CFLAGS="-Os -s -march=native -pipe -ffast-math -flto" CXXFLAGS="${CFLAGS}" && \
     make && make install 
 #--------------------------------------    
 
@@ -231,20 +219,23 @@ RUN curl -L https://github.com/tesseract-ocr/tessconfigs/archive/master.zip > ma
 
 
 # python dependencies 
+# img2pdf needs libffi-devel with python
+WORKDIR ${TMP_BUILD}/python-build
+RUN python3.8 -m venv myenv && source myenv/bin/activate && \
+    pip install ocrmypdf && \
+    ocrmypdf --help
+    
 WORKDIR ${DIST}/python
-# RUN curl -L https://github.com/secretshardul/leptonica_find/archive/master.zip > master.zip && \
-#     unzip master.zip && cp leptonica_find-master/main.py ./ && \
-#     rm -r leptonica_find-master master.zip && \
-# # RUN cd /opt/liblept && ls
-#     python3 -m venv myenv && \
-#     source myenv/bin/activate && \
-#     pip3 install --retries 200 --timeout 220 ocrmypdf && \
-#     python3 main.py
-# RUN pip3 install ocrmypdf --target .
-    # pip3 install --retries 20 --timeout 120 cffi --target . --upgrade
-    # cd cffi && \
-    # python setup.py build --force && python setup.py install
+RUN cp -r ${TMP_BUILD}/python-build/myenv/lib lib/
+    # pip install img2pdf
+    # pip install pikepdf && \
+    # curl -L http://triggs.djvu.org/djvu-editions.com/BIBLES/DRV/Download.pdf > bible.pdf && \
+    # echo "import pikepdf" >> test.py && echo "my_pdf = pikepdf.Pdf.open('bible.pdf')" >> test.py && \
+    # echo "my_pdf.save('bible-saved.pdf')" >> test.py && python3.8 test.py && ls
 
+WORKDIR /opt
+RUN yum -y install libX11 fontconfig libpng12 libpng12-devel libxcb-devel libXau-devel
+RUN cp -r /usr/lib64/{libjpeg.so*,libtiff.so*,libpng*,libjbig*,libX11.so*,libfontconfig*,libfreetype*,liblcms2.so*,libxcb.so.*,libXau.*}  ${DIST}/lib/
 
 
 WORKDIR /var/task
