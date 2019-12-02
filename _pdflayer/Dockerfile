@@ -1,5 +1,6 @@
-# FROM lambci/lambda-base:build
-FROM amazonlinux:2
+FROM lambci/lambda-base:build
+RUN python3 --version
+# FROM amazonlinux:1
 # FROM lambci/lambda:python3.8
 
 
@@ -14,9 +15,12 @@ RUN gcc --version && cpp --version && make --version && autoconf --version && ac
 #     yum --version
 
 # openssl for pip issue, yasm for libav
-RUN yum -y install libjpeg-devel libpng-devel libtiff-devel zlib-devel openssl-devel nasm libffi-devel \ 
-    libzip-devel freetype-devel lcms2-devel libwebp-devel \
-    tcl-devel tk-devel epel-release ; yum clean all && \
+# try removing- libjpeg,libpng,libtiff, openssl, nasm, libffi, lcms2, tcl-devel, tk-devel, epel-release
+# libjpeg-devel libpng-devel libtiff-devel openssl-devel nasm libffi-devel lcms2-devel
+# tcl-devel tk-devel epel-release ; yum clean all && \
+
+RUN yum -y install zlib-devel libzip-devel freetype-devel libwebp-devel \
+    libjpeg-devel libpng-devel libtiff-devel openssl-devel nasm libffi-devel lcms2-devel libxslt && \
     rpm -i http://mirror.centos.org/centos/8/AppStream/x86_64/os/Packages/giflib-5.1.4-3.el8.x86_64.rpm && \ 
     rpm -i http://mirror.centos.org/centos/8/PowerTools/x86_64/os/Packages/giflib-devel-5.1.4-3.el8.x86_64.rpm
 
@@ -34,18 +38,21 @@ RUN yum -y install libjpeg-devel libpng-devel libtiff-devel zlib-devel openssl-d
 #     cd gcc-${GCC_VERSION} && ./configure --enable-languages=c,c++ --disable-multilib && make && make install 
     
 
-ARG PYTHON_VERSION=3.8.0
-ARG TMP_BUILD=/tmp
-WORKDIR ${TMP_BUILD}/python-build
-RUN curl -L https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz | tar xJ && \
-    cd Python-${PYTHON_VERSION} && ./configure --enable-optimizations && make && make altinstall 
-RUN python3.8 --version && pip3.8 --version
+# ARG PYTHON_VERSION=3.8.0
+# ARG TMP_BUILD=/tmp
+# WORKDIR ${TMP_BUILD}/python-build
+# RUN curl -L https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz | tar xJ && \
+#     cd Python-${PYTHON_VERSION} && ./configure --enable-optimizations && make && make altinstall 
+# RUN python3.8 --version && pip3.8 --version
+
+
 # use python3.8 instead of python3
 
 ARG LEPTONICA_VERSION=1.78.0
 ARG TESSERACT_VERSION=4.1.0
 ARG AUTOCONF_ARCHIVE_VERSION=2017.09.28
-ARG GHOSTSCRIPT_VERSION=ghostscript-9.50
+ARG GHOSTSCRIPT_VERSION=ghostscript-9.27
+# ARG GHOSTSCRIPT_VERSION=ghostscript-9.50
 ARG QPDF_VERSION=9.1.0
 ARG JBIG2ENC_VERSION=0.29
 ARG LIBIMAGEQUANT_VERSION=2.12.5
@@ -91,8 +98,8 @@ RUN curl -L https://github.com/tesseract-ocr/tesseract/archive/${TESSERACT_VERSI
 #ghostscript, qpdf, jbig2enc, pngquant, unpaper
 # --disable-compile-inits --with-x --with-drivers=ALL --without-luratech --with-libiconv=gnu --prefix=/usr/local
 WORKDIR ${TMP_BUILD}/ghostscript-build
-RUN curl -L https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs950/${GHOSTSCRIPT_VERSION}.tar.gz | tar xz && \
-    cd ${GHOSTSCRIPT_VERSION} && \
+RUN curl -L https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs927/ghostscript-9.27.tar.gz | tar xz && \
+    cd ghostscript-9.27 && \
     ./autogen.sh && \
     ./configure  --prefix=${GHOSTSCRIPT}  && \
     make && make install 
@@ -138,7 +145,6 @@ RUN  curl -L https://github.com/libav/libav/archive/v${LIBAV_VERSION}.tar.gz | t
 #---------------unpaper issue----------------------------------
 # LIBAV_CFLAGS='-I/opt/libav/include' LIBAV_LIBS='-L/opt/libav/lib'
 WORKDIR ${TMP_BUILD}/unpaper-build  
-RUN yum -y install libxslt 
 RUN curl -L https://github.com/Flameeyes/unpaper/archive/${UNPAPER_VERSION}.tar.gz | tar xz && \
     cd unpaper-${UNPAPER_VERSION} && ls && \
     autoreconf -i && \
@@ -158,19 +164,10 @@ RUN curl -L https://github.com/Flameeyes/unpaper/archive/${UNPAPER_VERSION}.tar.
 
 #--------------------------------- copy to lib and bin--------------------
 
-# $(DIST) gives root
-#ghostscript, qpdf, jbig2enc, pngquant, libav, unpaper
-# rsync instead of cp to skip folder copy
-# cp ${LIBAV}/bin/* ${DIST}/bin/ && rsync -av ${LIBAV}/lib/* ${DIST}/lib/ --exclude ${LIBAV}/lib/pkgconfig && \
-# try without libs
-# cp ${GHOSTSCRIPT}/bin/* ${DIST}/bin/ && \
-# cp ${QPDF}/bin/* ${DIST}/bin/ && rsync -av ${QPDF}/lib/* ${DIST}/lib/ --exclude ${QPDF}/lib/pkgconfig/ && \
-# cp ${JBIG2ENC}/bin/* ${DIST}/bin/ && cp ${JBIG2ENC}/lib/* ${DIST}/lib/ && \
-# cp ${PNGQUANT}/bin/* ${DIST}/bin/ && \
-# cp ${UNPAPER}/bin/* ${DIST}/bin/ && \ 
 # issues: qpdf(libqpdf.so.26), jbig2enc(needs libpng,libpng12.so.0), pngquant(libpng12,libpng12.so.0)
 
 WORKDIR /opt 
+# libs present in amz linux 1 not needed- png, jpeg, tiff, jbig, x11, cms, xcb, xau
 RUN mkdir -p ${DIST}/lib && mkdir -p ${DIST}/bin && \
     cp ${TESSERACT}/bin/tesseract ${DIST}/bin/ && \
     cp ${TESSERACT}/lib/libtesseract.so.4  ${DIST}/lib/ && \
@@ -181,12 +178,10 @@ RUN mkdir -p ${DIST}/lib && mkdir -p ${DIST}/bin && \
     # try removing libjbig2enc.so
     cp ${PNGQUANT}/bin/pngquant ${DIST}/bin/ && \
     cp ${UNPAPER}/bin/unpaper ${DIST}/bin/ && \
-    cp /usr/lib64/libwebp.so.4 ${DIST}/lib/ && \
+    cp /usr/lib64/{libwebp.so.4,libgif.so*} ${DIST}/lib/ && \
     #for other libs
-    cp /usr/lib64/libgif.so ${DIST}/lib/ && \
-    cp /usr/lib64/libgif.so.7 ${DIST}/lib/ && \
     # for jbig2enc and pngquant
-    cp /usr/lib64/libpng* ${DIST}/lib/ && \
+    # cp /usr/lib64/libpng* ${DIST}/lib/ && \
     # cp /usr/lib64/freetype.so.6 ${DIST}/lib/ && \
     echo -e "LEPTONICA_VERSION=${LEPTONICA_VERSION}\nTESSERACT_VERSION=${TESSERACT_VERSION}\nTESSERACT_DATA_FILES=tessdata${TESSERACT_DATA_SUFFIX}/${TESSERACT_DATA_VERSION}" > ${DIST}/TESSERACT-README.md && \
     find ${DIST}/lib -name '*.so*' | xargs strip -s
@@ -220,22 +215,22 @@ RUN curl -L https://github.com/tesseract-ocr/tessconfigs/archive/master.zip > ma
 
 # python dependencies 
 # img2pdf needs libffi-devel with python
-WORKDIR ${TMP_BUILD}/python-build
-RUN python3.8 -m venv myenv && source myenv/bin/activate && \
-    pip install ocrmypdf && \
-    ocrmypdf --help
+# WORKDIR ${TMP_BUILD}/python-build
+# RUN python3.8 -m venv myenv && source myenv/bin/activate && \
+#     pip install ocrmypdf && \
+#     ocrmypdf --help
     
-WORKDIR ${DIST}/python
-RUN cp -r ${TMP_BUILD}/python-build/myenv/lib lib/
+# WORKDIR ${DIST}/python
+# RUN cp -r ${TMP_BUILD}/python-build/myenv/lib lib/
     # pip install img2pdf
     # pip install pikepdf && \
     # curl -L http://triggs.djvu.org/djvu-editions.com/BIBLES/DRV/Download.pdf > bible.pdf && \
     # echo "import pikepdf" >> test.py && echo "my_pdf = pikepdf.Pdf.open('bible.pdf')" >> test.py && \
     # echo "my_pdf.save('bible-saved.pdf')" >> test.py && python3.8 test.py && ls
 
-WORKDIR /opt
-RUN yum -y install libX11 fontconfig libpng12 libpng12-devel libxcb-devel libXau-devel
-RUN cp -r /usr/lib64/{libjpeg.so*,libtiff.so*,libpng*,libjbig*,libX11.so*,libfontconfig*,libfreetype*,liblcms2.so*,libxcb.so.*,libXau.*}  ${DIST}/lib/
+# WORKDIR /opt
+# RUN yum -y install libX11 fontconfig libpng12 libpng12-devel libxcb-devel libXau-devel
+# RUN cp -r /usr/lib64/{libjpeg.so*,libtiff.so*,libpng*,libjbig*,libX11.so*,libfontconfig*,libfreetype*,liblcms2.so*,libxcb.so.*,libXau.*}  ${DIST}/lib/
 
 
 WORKDIR /var/task
